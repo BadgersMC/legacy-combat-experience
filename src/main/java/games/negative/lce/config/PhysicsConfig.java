@@ -52,6 +52,14 @@ public class PhysicsConfig {
 
     @Comment({
             "",
+            "Whether or not to remove hit delay from all weapons.",
+            "This is the attack cooldown introduced in 1.9+.",
+            "When enabled, all weapons in combat-enabled worlds will have no attack cooldown."
+    })
+    private boolean removeHitDelay = true;
+
+    @Comment({
+            "",
             "Whether or not to enable the custom bridging physics",
             "which increases speed when using Shift + Backwards"
     })

@@ -9,6 +9,7 @@ import games.negative.lce.command.CommandGiveBlockHittingSword;
 import games.negative.lce.command.CommandLCE;
 import games.negative.lce.config.ConfigManager;
 import games.negative.lce.flag.FlagHandler;
+import games.negative.lce.listener.HitDelayListener;
 import games.negative.lce.listener.LegacyPhysicsListener;
 import games.negative.lce.listener.packet.BlockingPacketListener;
 import games.negative.lce.listener.packet.BridgingPacketListener;
@@ -61,6 +62,7 @@ public final class CombatPlugin extends AluminaPlugin {
         registerCommand(new CommandGiveBlockHittingSword());
         registerCommand(new CommandLCE());
         registerListener(new LegacyPhysicsListener());
+        registerListener(new HitDelayListener());
     }
 
     public void reload() {
