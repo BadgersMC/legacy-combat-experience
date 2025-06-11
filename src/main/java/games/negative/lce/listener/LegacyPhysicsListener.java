@@ -232,11 +232,111 @@ public class LegacyPhysicsListener implements Listener {
         if (!(event.getEntity() instanceof LivingEntity entity) || !CombatCheck.checkCombat(entity.getLocation()))
             return;
 
+        // Handle oldschool knockback if enabled
+        if (knockback().isOldschoolKnockback()) {
+            handleOldschoolKnockback(event, entity);
+            return;
+        }
+
+        // Fall back to the regular knockback system if oldschool is disabled
         games.negative.lce.struct.Vector vector = knockback().getKnockback().get(event.getCause());
         if (vector == null) return;
 
         Vector knockback = event.getKnockback().multiply(vector.toBukkitVector());
         event.setKnockback(knockback);
+    }
+
+    /**
+     * Handle oldschool knockback using the detailed knockback parameters
+     */
+    private void handleOldschoolKnockback(EntityKnockbackEvent event, LivingEntity entity) {
+        // Get the original knockback vector
+        Vector originalKnockback = event.getKnockback();
+        
+        // Extract the components
+        double horizX = originalKnockback.getX();
+        double horizZ = originalKnockback.getZ();
+        double vertical = originalKnockback.getY();
+        
+        // Calculate the horizontal length
+        double horizontalLength = Math.sqrt(horizX * horizX + horizZ * horizZ);
+        
+        // Apply horizontal modifier and extra
+        double newHorizontalLength = horizontalLength * knockback().getHorizontalModifier() + knockback().getHorizontalExtra();
+        
+        // If the entity is in air, apply air modifier
+        if (!entity.isOnGround()) {
+            newHorizontalLength *= knockback().getHorizontalAirModifier();
+        }
+        
+        // If the entity is sprinting, apply sprinting modifier
+        if (entity instanceof Player player && player.isSprinting()) {
+            newHorizontalLength *= knockback().getHorizontalSprintingModifier();
+        }
+        
+        // Apply horizontal friction
+        newHorizontalLength /= knockback().getHorizontalFriction();
+        
+        // Maintain the direction, scale to the new length
+        double scaleRatio = (horizontalLength > 0) ? newHorizontalLength / horizontalLength : 0;
+        double newHorizX = horizX * scaleRatio;
+        double newHorizZ = horizZ * scaleRatio;
+        
+        // Calculate vertical knockback
+        double newVertical = vertical * knockback().getVerticalModifier() + knockback().getVerticalExtra();
+        
+        // If the entity is in air, apply vertical air modifier
+        if (!entity.isOnGround()) {
+            newVertical *= knockback().getVerticalAirModifier();
+        }
+        
+        // If the entity is sprinting, apply vertical sprinting modifier
+        if (entity instanceof Player player && player.isSprinting()) {
+            newVertical *= knockback().getVerticalSprintingModifier();
+        }
+        
+        // Apply vertical friction
+        newVertical /= knockback().getVerticalFriction();
+        
+        // Cap vertical knockback to the max value
+        newVertical = Math.min(newVertical, knockback().getVerticalMax());
+        
+        // Create the new knockback vector
+        Vector newKnockback = new Vector(newHorizX, newVertical, newHorizZ);
+        
+        // Set the new knockback
+        event.setKnockback(newKnockback);
+    }
+    
+    /*
+     * Handle netherite knockback resistance
+     */
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onNetheriteKnockbackResistance(EntityKnockbackEvent event) {
+        if (event.isCancelled() 
+                || !knockback().isEnabled()
+                || !knockback().isDisableNetheriteKBResistance()) return;
+        
+        if (!(event.getEntity() instanceof Player player) || !CombatCheck.checkCombat(player.getLocation()))
+            return;
+        
+        // Check if player is wearing netherite armor
+        boolean wearingNetherite = false;
+        ItemStack[] armor = player.getInventory().getArmorContents();
+        for (ItemStack item : armor) {
+            if (item != null && item.getType().name().contains("NETHERITE_")) {
+                wearingNetherite = true;
+                break;
+            }
+        }
+        
+        // If wearing netherite, disable the built-in KB resistance
+        if (wearingNetherite) {
+            // Get the original knockback and multiply by 1.2 to offset netherite's 0.2 reduction
+            Vector originalKnockback = event.getKnockback();
+            Vector adjustedKnockback = originalKnockback.multiply(1.2);
+            event.setKnockback(adjustedKnockback);
+        }
     }
 
     /*

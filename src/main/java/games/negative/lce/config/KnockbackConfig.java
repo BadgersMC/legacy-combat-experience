@@ -26,6 +26,84 @@ public class KnockbackConfig {
 
     @Comment({
             "",
+            "Whether or not knockback should be handled like it was in 1.8."
+    })
+    private boolean oldschoolKnockback = true;
+
+    @Comment({
+            "",
+            "Horizontal extra knockback."
+    })
+    private double horizontalExtra = 0.4;
+
+    @Comment({
+            "",
+            "Vertical extra knockback."
+    })
+    private double verticalExtra = 0.06;
+
+    @Comment({
+            "",
+            "Horizontal friction."
+    })
+    private double horizontalFriction = 2.0;
+
+    @Comment({
+            "",
+            "Vertical friction."
+    })
+    private double verticalFriction = 2.0;
+
+    @Comment({
+            "",
+            "Horizontal modifier."
+    })
+    private double horizontalModifier = 0.4;
+
+    @Comment({
+            "",
+            "Vertical modifier."
+    })
+    private double verticalModifier = 0.36;
+
+    @Comment({
+            "",
+            "Horizontal air modifier."
+    })
+    private double horizontalAirModifier = 1.0;
+
+    @Comment({
+            "",
+            "Vertical air modifier."
+    })
+    private double verticalAirModifier = 1.0;
+
+    @Comment({
+            "",
+            "Vertical sprinting modifier."
+    })
+    private double verticalSprintingModifier = 1.0;
+
+    @Comment({
+            "",
+            "Horizontal sprinting modifier."
+    })
+    private double horizontalSprintingModifier = 1.0;
+
+    @Comment({
+            "",
+            "Vertical max."
+    })
+    private double verticalMax = 0.4;
+
+    @Comment({
+            "",
+            "This will remove the KB resistance that netherite armor has."
+    })
+    private boolean disableNetheriteKBResistance = true;
+
+    @Comment({
+            "",
             "A list of knockback modification values.",
             "All types:",
             "* DAMAGE | Knockback caused by non-entity damage.",
